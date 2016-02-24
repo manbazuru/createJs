@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>CreateJS基本編</title>
+    <script src="http://code.jquery.com/jquery.js"></script>
+<script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+
+
+<body>
+<h1>CreateJS -基本編-</h1>
+<div>
+  <p>オブジェクト絵画</p>
+  <canvas id="canvas1" width="1000" height="500"></canvas>
+</div>
+<div>
+  <p>グループ(container)とtickイベント</p>
+  <canvas id="canvas2" width="1000" height="550"></canvas>
+</div>
+<script>
+/*****
+ * 基本の基本編
+ */
+      // Stageオブジェクトを作成します。これはテンプレ
+      var stage = new createjs.Stage('canvas1');
+
+      // X方向とY方向のデフォルト値を決めとく。これの辺は任意。
+      var baseX = 100;
+      var baseY = 100;
+
+      // オプション
+      // object.rotation = 20; オブジェクトの回転 0-360
+      // object.scaleX = 0.6; オブジェクトのX方向拡大・縮小 0-無限
+      // object.scaleY = 6; オブジェクトのY方向拡大・縮小 0-無限
+      // object.alpha = 0.6; オブジェクトの透明度 0-1
+      // object.visible = false; オブジェクトの表示・非表示 true false(falseが非表示)
+      // object.regX = 100; scaleやrotationを利用した際の基準点を決めれる。デフォルトはキャンバスの左上。
+      // object.regY = -50; 上の基準点のY座標。
+
+      // オブジェクトの描画。createjs.Shape;
+      var shape = new createjs.Shape();
+
+      shape.graphics.beginFill('darkred'); // 赤色で描画するように設定
+      shape.graphics.drawCircle(0, 0, 50); //半径 50px の円を描画。中心基準。(中心のX座標, 中心のY座標, 半径)
+      shape.graphics.drawRect(100,0,100,100); //四角形を描画。左上基準。(X座標, Y座標, 横幅, 高さ, 角丸の幅, 角丸の高さ)
+
+      shape.graphics.beginFill('slategray'); //途中で色を変更することも可能
+      shape.graphics.drawRoundRect(250,0,100,100,10,10); //角丸四角形の描画。左上基準。(X座標, Y座標, 横幅, 高さ, 角丸の幅, 角丸の高さ)
+      shape.graphics.drawPolyStar(450, 0, 75, 5, 0.6, -90); //多角形の描画。中心基準。(x座標, y座標, 半径, 頂点数, 谷の深さ(0-1), 起点角(0は3時が基準。12時は-90を指定))
+      shape.graphics.drawPolyStar(600, 0, 55, 10, 0.8, -90);
+
+      shape.graphics //まとめてチェーンすることも出来る。
+          .beginStroke('skyblue') //線の色の設定
+          .setStrokeStyle(5) //線幅の設定
+          .moveTo(0,150) //描画スタート地点
+          .lineTo(100,150); //描画エンド地点
+
+      shape.x = baseX; // X座標。ここが基準点
+      shape.y = baseY; // Y座標。ここが基準点
+
+      stage.addChild(shape); // 描画したのを表示リストに追加。役者をステージに立たせるイメージ。
+
+
+      // テキストの描画。createjs.Text(テキスト, フォント, 色);で変数に入れてあげる。
+      var text = new createjs.Text('Hello World','24px sans-serif','skyblue');
+      text.textAlign = 'center'; //テキストアラインを指定できる。(start, end, left, right, center)
+                                 //四角形の中心を基準にするので、right、leftの扱いが少し違う。
+      text.textBaseline = 'top'; // vertical-alignの設定。1(top, hanging, middle, alphabetic, ideographic, bottom)
+
+      //テキストの描画。引数を空にして、指定のテキストをいれることも出来る。
+      var text2 = new createjs.Text('','24px sans-serif','slategray');
+      text2.text = 'sampleText';
+      text.x = baseX;
+      text.y = baseY + 200;
+      text2.x = baseX + 200;
+      text2.y = baseY + 200;
+      stage.addChild(text);
+      stage.addChild(text2);
+
+      //画像の描画。createjs.Bitmap(画像のURL);
+      var bm = new createjs.Bitmap('img/logo.png');
+      bm.x = baseX;
+      bm.y = baseY + 250;
+      bm.rotation = 20;
+      stage.addChild(bm);
+
+      var bm2 = new createjs.Bitmap('img/logo.png');
+      bm2.regX = 100; // scaleやrotationを利用した際の基準点を決めれる。デフォルトはキャンバスの左上。
+      bm2.regY = -50; // 上の基準点のY座標。
+      bm2.x = baseX + 250;
+      bm2.y = baseY + 250;
+      bm2.rotation = 20;
+      bm2.scaleX = 0.6;
+      bm2.scaleY = 0.6;
+      bm2.alpha = 0.6;
+      stage.addChild(bm2);
+
+      // Stageの描画を更新します。これがないと表示されない。
+      stage.update();
+</script>
+
+<script>
+/*****
+ * グループとかの考え方(親子構造)
+ */
+      /*
+        親子関係を構築すると、親の位置、角度、スケール、カラー、ブレンドなどの設定が、子孫にも継承されるようになります。
+        表示オブジェクトは親のプロパティーによって、子の表示も影響を受けるので、グループ化して表示の制御を行いたい場合に便利です。
+      */
+
+      // createjs.Container()を利用する。createjs.Container()の中にcreatejs.Container()を入れてネスト化することも可能。
+
+      var stage2 = new createjs.Stage('canvas2');
+
+      var container = new createjs.Container();
+      container.x = 250;
+      container.y = 250;
+      stage2.addChild(container);
+
+      for(var i = 0; i < 10; i++) {
+        var ball = new createjs.Shape();
+        ball.graphics
+          .beginFill('skyblue')
+          .drawCircle(0,0,30);
+
+        // 円周率上に配置する
+        ball.x = 150 * Math.sin(i * 360 / 10 * Math.PI / 180);
+        ball.y = 150 * Math.cos(i * 360 / 10 * Math.PI / 180);
+
+        container.addChild(ball);
+      }
+
+/*****
+ * tickイベントについて
+ */
+      // createjs.Ticker.addEventListener('tick', 関数名);
+      // 描画を更新するイベント。アニメーション時に使用する。1秒間に何回イベントが発生するかを指定可能。やり方は下記。
+
+      // createjs.Ticker.setFPS(60);
+      // デフォルトは24FPS(Frame per Seconds)だが、最近のWebアニメーションは60FPSが基準なので変更する。
+
+      // createjs.Ticker.timingMode = createjs.Ticker.RAF;
+      // ブラウザは画面更新するのに適したタイミングをもっています。このタイミングを使えば、最もアニメーションを滑らかに表示することができます。これをRequstAnimationFrameと呼ぶのですが、一般的に頭文字で略してRAFと呼ばれます。CreateJSでこのRAFを使うように指定できます。
+      //なので基本的にはcreatejs.Ticker.timingMode = createjs.Ticker.RAF;を指定しよう！！
+      var canvas = document.getElementById('canvas2');
+      var canvasX = canvas.width;
+      var canvasY = canvas.height;
+      var speed = 5;
+      var position = 150;
+
+      var ball2 = new createjs.Shape();
+      ball2.graphics
+        .beginFill('orange')
+        .drawCircle(0,0,30);
+      ball2.x = 15;
+      ball2.y = 500;
+      stage2.addChild(ball2);
+
+      // tickイベントの設定
+      createjs.Ticker.addEventListener('tick',ticker);
+      createjs.Ticker.timingMode = createjs.Ticker.RAF;
+
+      // tickイベントの内容
+      function ticker() {
+        // 単独でのアニメーション
+        if(ball2.x > canvasX - 15 || ball2.x < 0 + 15) {
+          speed *= -1;
+        }
+        ball2.x += speed;
+
+        // containerを指定すると、子供要素もまとめてアニメーションする。
+        container.rotation += 1;
+
+        stage2.update();
+      }
+</script>
+</body>
+</html>

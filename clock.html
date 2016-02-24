@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>CreateJS制作編 -時計-</title>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+
+
+<body>
+<h1>CreateJS -時計を作ってみる-</h1>
+<div>
+  <canvas id="canvas" width="1000" height="500"></canvas>
+</div>
+<div>
+
+<script>
+var canvas = document.getElementById('canvas');
+var stage = new createjs.Stage('canvas');
+
+var clock = new createjs.Container();
+var centerX = canvas.width / 2;
+var centerY = canvas.height / 2;
+clock.x = centerX;
+clock.y = centerY;
+stage.addChild(clock);
+
+
+// オブジェクト生成
+// ベースの円
+var clockBase = new createjs.Shape();
+clockBase.graphics
+  .beginFill('white')
+  .drawCircle(0,0,200);
+clockBase.x = 0;
+clockBase.y = 0;
+
+var centerCircle = new createjs.Shape();
+centerCircle.graphics
+  .beginFill('#5a5a5a')
+  .drawCircle(0,0,5);
+
+// 目盛り
+var scale = new createjs.Shape();
+var steps = 60;
+
+for(var i = 0; i < steps; i++) {
+  var angle = i * (360 / steps) - 90; //角度を計算
+  var radian = angle * Math.PI / 180; // ラジアンに変換
+
+  var startX = 190 * Math.cos(radian);
+  var startY = 190 * Math.sin(radian);
+  var endX = 200 * Math.cos(radian);
+  var endY = 200 * Math.sin(radian);
+
+  scale.graphics
+    .beginStroke('#ddd')
+    .setStrokeStyle(2)
+    .moveTo(startX,startY)
+    .lineTo(endX,endY);
+}
+
+// 秒針、分針、時針
+var secLine = new createjs.Shape();
+secLine.graphics
+  .beginStroke('#aaa')
+  .setStrokeStyle(1)
+  .moveTo(0,0)
+  .lineTo(0,-190);
+
+var minLine = new createjs.Shape();
+minLine.graphics
+  .beginStroke('#5a5a5a')
+  .setStrokeStyle(2)
+  .moveTo(0,0)
+  .lineTo(0,-190);
+
+var hourLine = new createjs.Shape();
+hourLine.graphics
+  .beginStroke('#666')
+  .setStrokeStyle(3)
+  .moveTo(0,0)
+  .lineTo(0,-110);
+
+
+// オブジェクトをadd
+clock.addChild(clockBase);
+clock.addChild(scale);
+clock.addChild(secLine);
+clock.addChild(minLine);
+clock.addChild(hourLine);
+clock.addChild(centerCircle);
+
+// tickイベント
+createjs.Ticker.addEventListener('tick',clockTick);
+createjs.Ticker.timingMode = createjs.Ticker.RAF;
+function clockTick() {
+  var date = new Date();
+  var hour = date.getHours();
+  var min = date.getMinutes();
+  var sec = date.getSeconds();
+
+  secLine.rotation = sec * (360 / 60);
+  minLine.rotation = min * (360 / 60);
+  hourLine.rotation = hour * (360 / 12 / 2);
+
+  stage.update();
+}
+</script>
+</body>
+</html>

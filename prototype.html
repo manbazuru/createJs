@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>CreateJS基本編 -expand,promote-</title>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body>
+<h1>CreateJS基本編 -expand,promote- とprototypeの理解</h1>
+<div>
+<canvas id="canvas" width="1000" height="500"></canvas>
+</div>
+
+<script>
+/*
+この2つは同じ意味。だけどprototypeで生成した方がいい。
+this.hogeだと毎回オブジェクトが生成されるため、効率がよくない。なので下の例を使っていこう。
+==================================
+
+function Class() {
+    // this{};が隠れて自動的に生成されている
+    
+    this.hoge = function(value) {
+        console.log(value);
+    };
+
+    // return this; これも隠れて自動で行っている。
+}
+var example = new Class();
+example.hoge('hello');
+
+==================================
+
+function Class() {}
+Class.prototype.hoge = function(value) {
+    console.log(value);
+};
+
+var example = new Class();
+
+example.hoge('hello');
+==================================
+*/
+
+var canvas;
+var stage;
+var shapes; // 作ったシェイプを格納する用
+
+// 円のクラス
+var Circle = function(color,x,y,size,alpha) { // 元となるオブジェクトを定義
+    this.Shape_constructor(); // コンストラクタの呼び出し
+    this.circle(color,x,y,size,alpha);
+};
+createjs.extend(Circle,createjs.Shape); // createJsで利用できるようにする。
+createjs.promote(Circle,'Shape'); // コンストラクタの定義
+
+Circle.prototype.circle = function(color,x,y,size,alpha) { // shapeの内容をprototype定義
+    alpha = alpha || 1;
+    this.graphics
+        .beginFill(color)
+        .drawCircle(0,0,size);
+    this.x = x;
+    this.y = y;
+    this.alpha = alpha;
+};
+
+// 汎用性の高いクラス
+var Initialize = function() { //こっちのパターンだと子クラスで様々な形を作れる。けど、newして定義のため少し記述が長くなる。
+    this.Shape_constructor();
+};
+createjs.extend(Initialize,createjs.Shape);
+createjs.promote(Initialize,'Shape');
+
+Initialize.prototype.line = function(color,size,startX,startY,endX,endY) {
+    this.graphics
+        .beginStroke(color)
+        .setStrokeStyle(size)
+        .moveTo(startX,startY)
+        .lineTo(endX,endY);
+};
+
+// 初期値
+function init() {
+    canvas = document.getElementById('canvas');
+    stage = new createjs.Stage(canvas);
+    stage.x = canvas.width / 2;
+    stage.y = canvas.height / 2;
+
+    // オブジェクト生成
+    var circle = new Circle('slategray',0,0,50,0.5);
+    var smallCircle = new Circle('pink',20,20,20);
+
+    var line = new Initialize();
+    line.line('pink',2,0,0,100,100);
+
+    shapes = [circle,smallCircle,line];
+
+    // オブジェクトをadd
+    stage.addChild(circle);
+    stage.addChild(smallCircle);
+    stage.addChild(line);
+
+    createjs.Ticker.addEventListener('tick',mytick);
+    createjs.Ticker.timingMode = createjs.Ticker.RAF;
+}
+
+// tickイベント
+var speedX = 1;
+var speedY = 1;
+function mytick() {
+    shapes[0].x += speedX * 2;
+    if(shapes[0].x > canvas.width / 2 - 50 || shapes[0].x < -canvas.width / 2 + 50) {
+        speedX *= -1;
+    }
+    shapes[0].y += speedY * 2;
+    if(shapes[0].y > canvas.height / 2 - 50 || shapes[0].y < -canvas.height / 2 + 50) {
+        speedY *= -1;
+    }
+    stage.update();
+}
+
+init();
+</script>
+</body>
+</html>

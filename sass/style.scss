@@ -1,0 +1,27 @@
+/* RESET */
+body,h1,p{
+  margin: 0;
+  padding: 0;
+}
+/* STYLE */
+body{
+  padding-bottom: 80px;
+}
+h1{
+  width: 100%; max-width: 1000px;
+  color: #5a5a5a;
+  font-weight: normal;
+  margin: 40px auto 0;
+}
+div{
+  width: 100%; max-width: 1000px;
+  margin: 40px auto 0;
+}
+canvas{
+  background-color: #efefef;
+  margin-top: 8px;
+}
+p{
+  color: #5a5a5a;
+  font-size: 16px;
+}
