@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>CreateJS基本編 -expand,promote-</title>
+    <title>CreateJS基本編 -斜めや円状に動かしてみる-</title>
     <script src="http://code.jquery.com/jquery-latest.js"></script>
     <script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
     <link rel="stylesheet" type="text/css" href="css/style.css">
@@ -17,73 +17,120 @@
 </div>
 
 <script>
-// 必要な変数を定義
+/***
+ * 必要な変数を定義
+ */
+// 初期化用
 var canvas;
 var stage;
+
+// シェイプ生成用
+var steps;
+var circleArray;
 var circle;
+
+// アニメーション用
 var count;
 
-// クラス生成
+var colors = ['darkred','slategray','orange','pink','gray'];
+
+
+/***
+ * クラス生成
+ */
 var Initialize = function() {
     this.Shape_constructor();
 };
 createjs.extend(Initialize,createjs.Shape);
 
-// 円を生成する子クラス (色、初期位置X、初期位置Y、半径のサイズ)
-Initialize.prototype.circle = function(color,x,y,size) {
+// 円を生成する子クラス (色、初期位置X、初期位置Y、半径のサイズ、初期角度)
+Initialize.prototype.circle = function(color,x,y,size,radian) {
     this.graphics
         .beginFill(color)
         .drawCircle(x,y,size);
     this.x = x;
     this.y = y;
+    this.radian = radian;
 };
-// アニメーション用の子クラス (X座標、Y座標、移動距離、ラジアン角度)
-Initialize.prototype.move = function(x,y,r,degree) {
-    this.x = x + r * Math.cos(degree);
-    this.y = y + r * Math.sin(degree);
+// アニメーション用の子クラス (X座標、Y座標、移動距離、ラジアン角度、シェイプの初期角度)
+Initialize.prototype.move = function(x,y,r,degree,radian) {
+    this.x = x + r * Math.cos(degree + radian);
+    this.y = y + r * Math.sin(degree + radian);
 };
 createjs.promote(Initialize,'Shape');
 
-// 初期化
+
+/***
+ * 初期化
+ */
 var init = function() {
+    // ステージの初期値
     canvas = document.getElementById('canvas');
     stage = new createjs.Stage(canvas);
     stage.x = canvas.width / 2;
     stage.y = canvas.height / 2;
 
-    circle = new Initialize();
-    circle.circle('skyblue',0,0,50);
+    // シェイプ生成
+    Func.createShapes();
 
-    stage.addChild(circle);
-
+    // アニメーション用のカウントを0に
     count = 0;
 
-    createjs.Ticker.addEventListener('tick',mytick);
+    // tickイベントの実行
+    createjs.Ticker.addEventListener('tick',Func.mytick);
     createjs.Ticker.timingMode = createjs.Ticker.RAF;
 };
 
-// tickイベント
-function mytick() {
-    // xとyをカウントアップし、移動距離をカウントアップさせることで斜めに移動する
-    /* circle.move(count,-count,count,0); */
 
-    // ラジアン角度をカウントアップさせると円状に移動する
-    /* circle.move(0,0,60,calcRadian(count)); */
+/***
+ * 関数群
+ */
+var Func = {
 
-    // 移動距離とラジアン角度をカウントアップすると渦巻き状に。角度を掛け算すると小さく、割り算で大きく回転する
-    circle.move(0,0,count / 2,calcRadian(count * 2));
+    // tickイベント
+    mytick : function() {
+        // xとyをカウントアップし、移動距離をカウントアップさせることで斜めに移動する
+        /* circle.move(count,-count,count,0); */
 
-    stage.update();
+        // ラジアン角度をカウントアップさせると円状に移動する
+        /* circle.move(0,0,60,Func.calcRadian(count)); */
 
-    count++;
-}
+        // 移動距離とラジアン角度をカウントアップすると渦巻き状に。角度を掛け算すると小さく、割り算で大きく回転する
+        /* circle.move(0,0,count / 2,Func.calcRadian(count * 2)); */
 
-// ラジアンに変換する関数
-function calcRadian(degree) {
-    degree = degree * Math.PI / 180;
-    return degree;
-}
+        for(var i = 0; i < circleArray.length; i++) {
+            // i番目の円をアニメーション(X座標、Y座標、移動距離、ラジアン角度、シェイプの初期角度)
+            circleArray[i].move(0,0,count / 2,Func.calcRadian(count * 2),circleArray[i].radian);
+        }
 
+        stage.update();
+
+        count++;
+    },
+
+    // ラジアンに変換する関数
+    calcRadian : function(degree) {
+        degree = degree * Math.PI / 180;
+        return degree;
+    },
+
+    // シェイプを生成する関数
+    createShapes : function() {
+        // 何個生成するかを定義
+        steps = 3;
+
+        // 複数シェイプを生成する時は配列にいれる
+        circleArray = new Array();
+
+        // シェイプ生成してステージにadd
+        for(var i = 0; i < steps; i++) {
+            circle = new Initialize();
+            circle.circle(colors[i],0,0,20,Func.calcRadian(i * 360 / steps));
+            circleArray.push(circle);
+            stage.addChild(circleArray[i]);
+        }
+    }
+};
 init();
 </script>
 </body>

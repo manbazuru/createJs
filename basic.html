@@ -57,6 +57,19 @@
           .moveTo(0,150) //描画スタート地点
           .lineTo(100,150); //描画エンド地点
 
+      shape.graphics
+        .beginStroke('#eee')
+        .beginFill('orange')
+        .arc(500,200,50,0,calcDegree(180),true); //半円の描画。(x座標、y座標、半径、始点ラジアン、終点ラジアン、円の方向(trueは時計回り))
+
+      shape.graphics
+        .beginFill('darkred')
+        .arc(650,200,50,calcDegree(-90),calcDegree(90),true); //半円の縦版
+
+      shape.graphics
+        .beginFill('slategray')
+        .drawEllipse(700,125,100,150); //楕円の描画。中心基準。(x座標、y座標、横の直径、縦の直径)
+
       shape.x = baseX; // X座標。ここが基準点
       shape.y = baseY; // Y座標。ここが基準点
 
@@ -99,6 +112,11 @@
 
       // Stageの描画を更新します。これがないと表示されない。
       stage.update();
+
+      function calcDegree(degree) {
+          var degree = degree * Math.PI / 180;
+          return degree;
+      }
 </script>
 
 <script>
