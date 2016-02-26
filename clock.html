@@ -30,7 +30,7 @@ var needles;
 var timeNumber;
 
  /***********
- * 汎用クラス作成
+ * シェイプ用クラス作成
  **********/
 var Initialize = function() {
   this.Shape_constructor();
@@ -47,7 +47,6 @@ Initialize.prototype.circle = function(color,x,y,size) {
 };
 
 // 線を生成 (色、線の幅、開始位置X、開始位置Y、終了位置X、終了位置Y)
-// 初期位置の指定はなしのため親に準ずる。
 Initialize.prototype.line = function(color,lineSize,startX,startY,endX,endY) {
   this.graphics
     .beginStroke(color)
