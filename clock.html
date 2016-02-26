@@ -8,7 +8,6 @@
 <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 
-
 <body>
 <h1>CreateJS -時計を作ってみる-</h1>
 <div>
@@ -17,97 +16,142 @@
 <div>
 
 <script>
-var canvas = document.getElementById('canvas');
-var stage = new createjs.Stage('canvas');
 
-var clock = new createjs.Container();
-var centerX = canvas.width / 2;
-var centerY = canvas.height / 2;
-clock.x = centerX;
-clock.y = centerY;
-stage.addChild(clock);
+// 初期化用
+var canvas,stage;
 
+// シェイプ用
+var baseCircle;
+var centerCircle;
+var secLine;
+var minLine;
+var hourLine;
+var needles;
+var timeNumber;
 
-// オブジェクト生成
-// ベースの円
-var clockBase = new createjs.Shape();
-clockBase.graphics
-  .beginFill('white')
-  .drawCircle(0,0,200);
-clockBase.x = 0;
-clockBase.y = 0;
+ /***********
+ * 汎用クラス作成
+ **********/
+var Initialize = function() {
+  this.Shape_constructor();
+};
+createjs.extend(Initialize,createjs.Shape);
 
-var centerCircle = new createjs.Shape();
-centerCircle.graphics
-  .beginFill('#5a5a5a')
-  .drawCircle(0,0,5);
+// 円を生成 (色、初期位置X、初期位置Y、半径の長さ)
+Initialize.prototype.circle = function(color,x,y,size) {
+  this.graphics
+    .beginFill(color)
+    .drawCircle(x,y,size);
+  this.x = x;
+  this.y = y;
+};
 
-// 目盛り
-var scale = new createjs.Shape();
-var steps = 60;
-
-for(var i = 0; i < steps; i++) {
-  var angle = i * (360 / steps) - 90; //角度を計算
-  var radian = angle * Math.PI / 180; // ラジアンに変換
-
-  var startX = 190 * Math.cos(radian);
-  var startY = 190 * Math.sin(radian);
-  var endX = 200 * Math.cos(radian);
-  var endY = 200 * Math.sin(radian);
-
-  scale.graphics
-    .beginStroke('#ddd')
-    .setStrokeStyle(2)
+// 線を生成 (色、線の幅、開始位置X、開始位置Y、終了位置X、終了位置Y)
+// 初期位置の指定はなしのため親に準ずる。
+Initialize.prototype.line = function(color,lineSize,startX,startY,endX,endY) {
+  this.graphics
+    .beginStroke(color)
+    .setStrokeStyle(lineSize)
     .moveTo(startX,startY)
     .lineTo(endX,endY);
+};
+createjs.promote(Initialize,'Shape');
+
+
+ /***********
+ * 初期化
+ **********/
+var init = function() {
+  canvas = document.getElementById('canvas');
+  stage = new createjs.Stage(canvas);
+  stage.x = canvas.width / 2;
+  stage.y = canvas.height / 2;
+
+  createShapes();
+
+  createjs.Ticker.addEventListener('tick',mytick);
+  createjs.Ticker.timingMode = createjs.Ticker.RAF;
+};
+
+
+/***********
+ * 関数群
+ **********/
+// シェイプ作成用
+function createShapes() {
+  // 土台
+  baseCircle = new Initialize();
+  baseCircle.circle('#ddd',0,0,230);
+  stage.addChild(baseCircle);
+
+  // 秒針
+  secLine = new Initialize();
+  secLine.line('#aaa',1,0,0,0,-225);
+  stage.addChild(secLine);
+
+  // 分針
+  minLine = new Initialize();
+  minLine.line('#999',1,0,0,0,-225);
+  stage.addChild(minLine);
+
+  // 時針
+  hourLine = new Initialize();
+  hourLine.line('#999',3,0,0,0,-110);
+  stage.addChild(hourLine);
+
+  // 目盛り
+  var steps = 60;
+  for(var i = 0; i < steps; i++) {
+    needles = new Initialize();
+    var calc = i % 5 === 0;
+    var color = calc ? '#aaa' : '#bbb';
+    var stroke = calc ? 3 : 1;
+    var endPosition = calc ? 210 : 220;
+    var startX = 225 * Math.cos(calcRadian(360 / steps * i));
+    var startY = 225 * Math.sin(calcRadian(360 / steps * i));
+    var endX = endPosition * Math.cos(calcRadian(360 / steps * i));
+    var endY = endPosition * Math.sin(calcRadian(360 / steps * i));
+
+    needles.line(color,stroke,startX,startY,endX,endY);
+    stage.addChild(needles);
+  }
+
+  // 時刻文字
+  for(var t = 0; t < 12; t++) {
+    timeNumber = new createjs.Text(t,'16px sans-serif','slategray');
+    timeNumber.textAlign = 'center';
+    timeNumber.textBaseline = 'middle';
+    timeNumber.x = 190 * Math.cos(calcRadian(360 / 12 * t - 90));
+    timeNumber.y = 190 * Math.sin(calcRadian(360 / 12 * t - 90));
+    stage.addChild(timeNumber);
+  }
+
+  // 中心の小さい円
+  centerCircle = new Initialize();
+  centerCircle.circle('slategray',0,0,5);
+  stage.addChild(centerCircle);
 }
 
-// 秒針、分針、時針
-var secLine = new createjs.Shape();
-secLine.graphics
-  .beginStroke('#aaa')
-  .setStrokeStyle(1)
-  .moveTo(0,0)
-  .lineTo(0,-190);
-
-var minLine = new createjs.Shape();
-minLine.graphics
-  .beginStroke('#5a5a5a')
-  .setStrokeStyle(2)
-  .moveTo(0,0)
-  .lineTo(0,-190);
-
-var hourLine = new createjs.Shape();
-hourLine.graphics
-  .beginStroke('#666')
-  .setStrokeStyle(3)
-  .moveTo(0,0)
-  .lineTo(0,-110);
-
-
-// オブジェクトをadd
-clock.addChild(clockBase);
-clock.addChild(scale);
-clock.addChild(secLine);
-clock.addChild(minLine);
-clock.addChild(hourLine);
-clock.addChild(centerCircle);
-
-// tickイベント
-createjs.Ticker.addEventListener('tick',clockTick);
-createjs.Ticker.timingMode = createjs.Ticker.RAF;
-function clockTick() {
+// アニメーション用
+function mytick() {
   var date = new Date();
   var hour = date.getHours();
-  var min = date.getMinutes();
-  var sec = date.getSeconds();
+  var minute = date.getMinutes();
+  var seconds = date.getSeconds();
 
-  secLine.rotation = sec * (360 / 60);
-  minLine.rotation = min * (360 / 60);
-  hourLine.rotation = hour * (360 / 12 / 2);
+  secLine.rotation = 360 / 60 * seconds;
+  minLine.rotation = (360 / 60 * minute) + (360 / 60 / 60 * seconds);
+  hourLine.rotation = (360 / 12 * hour) + (360 / 12 / 60 * minute);
 
   stage.update();
 }
+
+// ラジアンに変換
+function calcRadian(degree) {
+  degree = degree * Math.PI / 180;
+  return degree;
+}
+init();
 </script>
 </body>
 </html>
