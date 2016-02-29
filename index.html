@@ -4,99 +4,8 @@
     <meta charset="UTF-8">
     <title>My Tools</title>
     <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="css/top_style.css">
 </head>
-<style>
-
-body,p{
-    font-family: 'Source Sans Pro', sans-serif;
-    font-weight: 400;
-    margin: 0;
-    padding: 0;
-}
-a{
-    color: inherit;
-    text-decoration: none;
-}
-
-body{
-    font-family: sans-serif;
-}
-
-.title{
-    width: 100%; max-width: 1000px;
-    border-bottom: 1px solid #5a5a5a;
-    margin: 40px auto 0;
-}
-    .base-wrap + .title{
-        margin-top: 80px;
-    }
-
-
-.base-wrap{
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
-    overflow: hidden;
-}
-    .base-wrap > p{
-        width: 20%;
-        background-color: #ccc;
-        border-radius: 6px;
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-        color: #5a5a5a;
-        line-height: 1.6;
-        margin-top: 48px;
-        float: left;
-        text-align: center;
-        transition: 0.3s;
-    }
-        .base-wrap > p + p{
-            margin-left: 6.66666666%;
-        }
-        .base-wrap > p:nth-child(4n + 1){
-            margin-left: 0;
-        }
-    .base-wrap > p:hover{
-        background-color: #5a5a5a;
-        color: #fff;
-    }
-
-
-p > a{
-    width: 100%;
-    height: 100%;
-    display: block;
-    padding: 10px 0;
-}
-
-.footer{
-    width: 100%;
-    background-color: #eee;
-    margin-top: 80px;
-    padding: 40px 0;
-}
-.footer .footer-wrap{
-    width: 1000px;
-    margin: 0 auto;
-}
-.footer h2{
-    color: #5a5a5a;
-    font-size: 14px;
-    margin-top: 40px;
-}
-.footer p{}
-.footer ul{
-    list-style: none;
-    padding: 0;
-}
-.footer ul > li{
-}
-.footer ul > li a{
-    color: #06c;
-}
-</style>
 
 <body>
 <p class="title">createJs 基本編</p>
@@ -109,16 +18,16 @@ p > a{
 <div class="base-wrap">
     <p><a href="clock.html">時計</a></p>
 </div>
-<footer class="footer">
-    <div class="footer-wrap">
-        <h2>読み込み</h2>
-        <p>&lt;script src="https://code.createjs.com/createjs-2015.11.26.min.js"&gt;&lt;/script&gt;</p>
+<footer>
+        <p>
+            読み込み<br>
+            &lt;script src="https://code.createjs.com/createjs-2015.11.26.min.js"&gt;&lt;/script&gt;
+        </p>
 
-        <h2>参考URL</h2>
+        <p>参考URL</p>
         <ul>
             <li><a href="https://ics.media/tutorial-createjs/index.html">https://ics.media/tutorial-createjs/index.html</a></li>
         </ul>
-    </div>
 </footer>
 </body>
 </html>

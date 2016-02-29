@@ -1,13 +1,15 @@
 /* RESET */
-body,h1,p{
-  margin: 0;
-  padding: 0;
+body,h1,h2,h3,p{
+    color: #5a5a5a;
+    font-family: 'Source Sans Pro', sans-serif;
+    margin: 0;
+    padding: 0;
 }
 /* STYLE */
 body{
   padding-bottom: 80px;
 }
-h1{
+h1,h2{
   width: 100%; max-width: 1000px;
   color: #5a5a5a;
   font-weight: normal;
@@ -15,7 +17,7 @@ h1{
 }
 div{
   width: 100%; max-width: 1000px;
-  margin: 40px auto 0;
+  margin: 24px auto 0;
 }
 canvas{
   background-color: #efefef;
@@ -24,4 +26,8 @@ canvas{
 p{
   color: #5a5a5a;
   font-size: 16px;
+  line-height: 2;
+}
+p + p{
+  margin-top: 16px;
 }

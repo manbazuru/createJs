@@ -12,12 +12,53 @@
 <body>
 <h1>CreateJS -基本編-</h1>
 <div>
-  <p>オブジェクト絵画</p>
+  <h2>オブジェクト絵画</h2>
   <canvas id="canvas1" width="1000" height="500"></canvas>
 </div>
+
 <div>
-  <p>グループ(container)とtickイベント</p>
+  <h2>グループ(container)とtickイベント</h2>
   <canvas id="canvas2" width="1000" height="550"></canvas>
+</div>
+
+<div>
+  <h2>マウス座標取得</h2>
+  <div>
+    <p>
+      var mx = stage.mouseX;<br>
+      var my = stage.mouseY;
+    </p>
+  </div>
+  <canvas id="canvas3" width="1000" height="550"></canvas>
+</div>
+
+<div>
+  <h2>イベント追加</h2>
+  <div>
+    <p>クリックイベント<br>
+      表示オブジェクト.addEventListener("click", 関数名);
+    </p>
+    <p>ホバーイベント<br>
+      表示オブジェクト.addEventListener("mouseover", 関数名);<br>
+      表示オブジェクト.addEventListener("mouseout", 関数名);
+    </p>
+    <p>ドラッグアンドドロップ<br>
+      表示オブジェクト.addEventListener("mousedown", 関数名); //対象物を押したときだけ発生 (一度だけ発生)<br>
+      表示オブジェクト.addEventListener("pressmove", 関数名); //対象物を押した状態でマウスを移動したときに発生 (連続して発生)<br>
+      表示オブジェクト.addEventListener("pressup", 関数名); //対象物を押した状態からマウスを離したときに発生 (一度だけ発生)
+    </p>
+    <p>
+      タッチイベント<br>
+      // ステージを作成
+      var stage = new createjs.Stage("myCanvas");<br>
+
+      // タッチ操作をサポートしているブラウザーならばタッチ操作を有効にする<br>
+      if(createjs.Touch.isSupported() == true){<br>
+          createjs.Touch.enable(stage)
+      }
+    </p>
+  </div>
+  <canvas id="canvas4" width="1000" height="550"></canvas>
 </div>
 <script>
 /*****
@@ -193,6 +234,65 @@
 
         stage2.update();
       }
+</script>
+
+<script>
+var canvas3 = document.getElementById('canvas3');
+var stage3 = new createjs.Stage(canvas3);
+
+var shape3 = new createjs.Shape();
+shape3.graphics.beginFill('slategray').drawCircle(0,0,50);
+stage3.addChild(shape3);
+
+createjs.Ticker.addEventListener('tick',mytick);
+createjs.Ticker.timingMode = createjs.Ticker.RAF;
+
+function mytick() {
+  var mx = stage3.mouseX;
+  var my = stage3.mouseY;
+
+  shape3.x = mx;
+  shape3.y = my;
+
+  stage3.update();
+}
+</script>
+
+<script>
+var initX;
+var initY;
+
+var canvas4 = document.getElementById('canvas4');
+var stage4 = new createjs.Stage(canvas4);
+
+var shape4 = new createjs.Shape();
+shape4.graphics.beginFill('slategray').drawCircle(0,0,50);
+shape4.x = canvas4.width / 2;
+shape4.y = canvas4.height / 2;
+stage4.addChild(shape4);
+
+createjs.Ticker.addEventListener('tick',dd);
+createjs.Ticker.timingMode = createjs.Ticker.RAF;
+
+function dd() {
+  shape4.addEventListener('mousedown',drag);
+  shape4.addEventListener('pressmove',drop);
+  stage4.update();
+}
+
+function drag() {
+  initX = stage4.mouseX - shape4.x;
+  initY = stage4.mouseY - shape4.y;
+}
+
+function drop() {
+  var positionX = stage4.mouseX;
+  var positionY = stage4.mouseY;
+
+  shape4.x = positionX - initX;
+  shape4.y = positionY - initY;
+}
+
 </script>
 </body>
 </html>
