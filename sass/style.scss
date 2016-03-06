@@ -19,6 +19,10 @@ div{
   width: 100%; max-width: 1000px;
   margin: 24px auto 0;
 }
+div.canvas{
+  width: 100%;
+  max-width: 100%;
+}
 canvas{
   background-color: #efefef;
   margin-top: 8px;

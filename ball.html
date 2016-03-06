@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ボールを落としてみる</title>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body>
+<div>
+  <h1>ballを落としてみる</h1>
+  <canvas id="canvas" width="1000" height="400"></canvas>
+</div>
+
+<script>
+var canvas,stage;
+var circles,circle,size;
+var speedX,speedY;
+
+var Initialize = function() {
+  this.Shape_constructor();
+};
+createjs.extend(Initialize,createjs.Shape);
+
+Initialize.prototype.circle = function(color,x,y,size) {
+  this.graphics.beginFill(color).drawCircle(x,y,size);
+};
+createjs.promote(Initialize,'Shape');
+
+var init = function() {
+  canvas = document.getElementById('canvas');
+  stage = new createjs.Stage(canvas);
+  size = 10;
+  circles = [];
+
+  createShapes();
+
+  createjs.Ticker.timingMode = createjs.Ticker.RAF;
+  createjs.Ticker.addEventListener('tick',mytick);
+};
+
+function createShapes() {
+  for(var i= 0; i < 20; i++) {
+    circle = new Initialize();
+    circle.circle('darkred',0,0,size);
+    circle.x = Math.random() * canvas.width;
+    circle.y = Math.random() * canvas.height;
+    circle.speedY = 0;
+     //Math.random() * (max - min) + min;
+    circles.push(circle);
+    stage.addChild(circles[i]);
+  }
+}
+
+function mytick() {
+  for(var i = 0; i < circles.length; i++) {
+    circle = circles[i];
+
+    circle.speedY += 0.5;
+    circle.speedY *= 0.98; // バウンドの大きさ。1でバウンドし続ける。0.9とかまでいくとほとんどバウンドしない。
+
+    circle.y += circle.speedY;
+
+    if(circle.y > canvas.height - size) {
+      circle.y = canvas.height - size;
+      circle.speedY *= -1;
+    }
+  }
+  stage.update();
+}
+init();
+
+</script>
+</body>
+</html>

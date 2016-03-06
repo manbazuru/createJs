@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ボールをうねうねさせてみる</title>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body>
+<div>
+  <h1>ballをうねうねさせてみる</h1>
+  <canvas id="canvas" width="1000" height="400"></canvas>
+</div>
+
+<script>
+var canvas,stage;
+var circle;
+
+var init = function() {
+  canvas = document.getElementById('canvas');
+  stage = new createjs.Stage(canvas);
+
+  count = 0;
+
+  circle = new createjs.Shape();
+  circle.graphics.beginFill('skyblue').drawCircle(0,0,30);
+  circle.x = 30;
+  circle.y = 0;
+  stage.addChild(circle);
+
+  createjs.Ticker.timingMode = createjs.Ticker.RAF;
+  createjs.Ticker.addEventListener('tick',mytick);
+};
+
+
+var countX = 0; // カウントの初期値。count + speedで動く速さを決める。
+var countY = 0;
+var range = 50; // 中心からの振り幅
+var speedX = 2;
+var speedY = 0.16;
+
+function mytick() {
+  countX += speedX;
+  countY += speedY;
+  circle.x = countX;
+  // 中心にする位置 + 中心からどれだけ動かすか * うねうねさせる速度
+  circle.y = canvas.height / 2 + range * Math.sin(countY / 4);
+
+  if(circle.x > canvas.width - 30 || circle.x < 0) {
+    speedX *= -1;
+  }
+
+  stage.update();
+}
+
+function calcRadian(degree) {
+  degree = degree * Math.PI / 180;
+  return degree;
+}
+init();
+
+</script>
+</body>
+</html>

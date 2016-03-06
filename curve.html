@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ベジェ曲線</title>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body>
+<div>
+  <h1>ベジェ曲線を書いてみる</h1>
+  <p>.quadraticCurveTo(経由点X,経由点Y,着地点X,着地点Y);</p>
+  <canvas id="canvas" width="1000" height="400"></canvas>
+</div>
+
+<script>
+var canvas,stage;
+var wave;
+var oldX,oldY,newX,newY,curveX,curveY;
+var num = 2;
+var range = 100;
+var count = 0;
+
+var init = function() {
+  canvas = document.getElementById('canvas');
+  stage = new createjs.Stage(canvas);
+
+  oldX = 0;
+  oldY = 0;
+
+  wave = new createjs.Shape();
+  wave.graphics
+    .beginFill('pink')
+    .moveTo(0,canvas.height/ 2);
+
+  for(var i = 0; i <= num; i++) {
+    newX = i * canvas.width / num; // アンカーポイントXの数をcanvasの横幅から求め、等幅間隔に並べる
+    curveX = (oldX + newX) / 2; // 開始点と終点の中間にコントロールポイントXを置く
+
+    newY = canvas.height / 2;
+    curveY = range + newY;
+
+    wave.graphics
+      .quadraticCurveTo(curveX,curveY,newX,newY);
+console.log('old:' + oldY);
+console.log('curve:' + curveY);
+console.log('new:' + newY);
+    range *= -1;
+    oldX = newX;
+    oldY = newY;
+  }
+
+  wave.graphics
+     .lineTo(canvas.width,canvas.height)
+     .lineTo(0,canvas.height)
+    .closePath();
+
+  stage.addChild(wave);
+
+  createjs.Ticker.timingMode = createjs.Ticker.RAF;
+  createjs.Ticker.addEventListener('tick',mytick);
+};
+
+function mytick() {
+  stage.update();
+}
+
+function calcRadian(degree) {
+  degree = degree * Math.PI / 180;
+  return degree;
+}
+
+/*
+function calcY(num){
+  var rad = 0;
+  count += 1;
+  rad += Math.sin(num * Math.PI / 180 + count);
+  return rad;
+}
+*/
+
+init();
+</script>
