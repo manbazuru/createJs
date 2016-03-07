@@ -18,8 +18,8 @@
 var canvas,stage;
 var wave;
 var oldX,oldY,newX,newY,curveX,curveY;
-var num = 2;
-var range = 100;
+var num = 50;
+var range = 20;
 var count = 0;
 
 var init = function() {
@@ -38,17 +38,17 @@ var init = function() {
     newX = i * canvas.width / num; // アンカーポイントXの数をcanvasの横幅から求め、等幅間隔に並べる
     curveX = (oldX + newX) / 2; // 開始点と終点の中間にコントロールポイントXを置く
 
-    newY = canvas.height / 2;
-    curveY = range + newY;
+    newY = oldY + range * Math.sin(calcRadian(count));
+    curveY = (oldY + newY) / 2;
 
     wave.graphics
       .quadraticCurveTo(curveX,curveY,newX,newY);
 console.log('old:' + oldY);
 console.log('curve:' + curveY);
 console.log('new:' + newY);
-    range *= -1;
     oldX = newX;
     oldY = newY;
+    count += 10;
   }
 
   wave.graphics
