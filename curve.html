@@ -18,44 +18,19 @@
 var canvas,stage;
 var wave;
 var oldX,oldY,newX,newY,curveX,curveY;
-var num = 50;
-var range = 20;
-var count = 0;
+var num = 200;
+var range = 15;
+var count;
 
 var init = function() {
   canvas = document.getElementById('canvas');
   stage = new createjs.Stage(canvas);
+  stage.clear();
 
-  oldX = 0;
-  oldY = 0;
+  count = 0;
 
   wave = new createjs.Shape();
-  wave.graphics
-    .beginFill('pink')
-    .moveTo(0,canvas.height/ 2);
-
-  for(var i = 0; i <= num; i++) {
-    newX = i * canvas.width / num; // アンカーポイントXの数をcanvasの横幅から求め、等幅間隔に並べる
-    curveX = (oldX + newX) / 2; // 開始点と終点の中間にコントロールポイントXを置く
-
-    newY = oldY + range * Math.sin(calcRadian(count));
-    curveY = (oldY + newY) / 2;
-
-    wave.graphics
-      .quadraticCurveTo(curveX,curveY,newX,newY);
-console.log('old:' + oldY);
-console.log('curve:' + curveY);
-console.log('new:' + newY);
-    oldX = newX;
-    oldY = newY;
-    count += 10;
-  }
-
-  wave.graphics
-     .lineTo(canvas.width,canvas.height)
-     .lineTo(0,canvas.height)
-    .closePath();
-
+  
   stage.addChild(wave);
 
   createjs.Ticker.timingMode = createjs.Ticker.RAF;
@@ -63,6 +38,36 @@ console.log('new:' + newY);
 };
 
 function mytick() {
+  oldX = 0;
+  oldY = 0;
+
+  wave.graphics.clear()
+    .beginFill('skyblue')
+    .moveTo(0,canvas.height/ 2);
+
+  for(var i = 0; i <= num; i++) {
+    newX = i * canvas.width / num; // アンカーポイントXの数をcanvasの横幅から求め、等幅間隔に並べる
+    curveX = (oldX + newX) / 2; // 開始点と終点の中間にコントロールポイントXを置く
+
+    newY = canvas.height / 2 + range * Math.sin(calcRadian(i + count));
+    curveY = (oldY + canvas.height / 2 + newY) / 2;
+
+    wave.graphics
+      .quadraticCurveTo(curveX,curveY,newX,newY);
+
+// console.log('old:' + oldY);
+// console.log('curve:' + curveY);
+// console.log('new:' + newY);
+
+    count += 0.015;
+    oldX = newX;
+    oldY = newY - canvas.height / 2;
+  }
+
+  wave.graphics
+     .lineTo(canvas.width,canvas.height)
+     .lineTo(0,canvas.height)
+     .closePath();
   stage.update();
 }
 
@@ -70,15 +75,6 @@ function calcRadian(degree) {
   degree = degree * Math.PI / 180;
   return degree;
 }
-
-/*
-function calcY(num){
-  var rad = 0;
-  count += 1;
-  rad += Math.sin(num * Math.PI / 180 + count);
-  return rad;
-}
-*/
 
 init();
 </script>
